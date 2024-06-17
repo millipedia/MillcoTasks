@@ -1,0 +1,568 @@
+<?php
+
+namespace ProcessWire;
+
+/**
+ * MillcoTasks
+ * 
+ * TODO: make this todo app.
+ */
+
+
+class MillcoTasks extends Process implements Module, ConfigurableModule
+{
+
+	public $mu_settings; // some sitewide settings.
+
+	public static function getModuleInfo()
+	{
+		return [
+			'title' => 'MillcoTasks',
+			'summary' => 'Card board.',
+			'version' => 1,
+			'autoload' => false,
+			'singular' => true,
+			'permanent' => false,
+			'permission' => 'millco-tasks',
+			'permissions' => array(
+				'millco-tasks' => 'Millco tasks',
+				'millco-tasks-manage' => 'Manage Millco tasks'
+			),
+
+			'icon' => 'check-square-o',
+			// page that you want created to execute this module
+			'page' => [
+				'name' => 'millcotasks',
+				'parent' => 'setup',
+				'title' => 'Tasks',
+				'permission' => 'millco-tasks-manage',
+			],
+			// Me trying and failing to add permissions to the 
+			// page created under setup
+			// 'useNavJSON' => true, 
+			// 'nav' => [
+			// 	[
+			// 	  'url' => '', 
+			// 	  'label' => __('tasks'),
+			// 	  'permission' => 'millco-tasks-manage',
+			// 	],
+			// ],
+			'requires' => [
+				'PHP>=8.0.0',
+				'ProcessWire>=3.0.16',
+			],
+		];
+	}
+
+	// Add config fields.
+	function getModuleConfigInputfields(InputfieldWrapper $inputfields)
+	{
+		// actually do I want to do these here we have them on the page?
+		return $inputfields;
+	}
+
+	static protected $defaults = array(
+		'top' => ''
+	);
+
+	public function __construct()
+	{
+		// populate defaults, which will get replaced with actual
+		// configured values before the init/ready methods are called
+		$this->setArray(self::$defaults);
+	}
+
+
+	// 	init() method: This is called during the initialization after all modules have been loaded but before ProcessWire has fully bootstrapped and started delivering content.
+	//  It’s the right place to add hooks or events that occur before page rendering starts.
+
+	public function init()
+	{
+		/** @var MillcoTasks $this */
+
+		// Add routes for our ajax callls
+
+
+		// Add a deck
+		wire()->addHook('/millcotasks/deck/add/{board_id}', function ($event) {
+			include('ajax_deck_add.php');
+		});
+
+		// Add a deck
+		wire()->addHook('/millcotasks/deck/title/{deck_id}', function ($event) {
+			include('ajax_deck_title.php');
+		});
+
+		// add a task.
+		wire()->addHook('/millcotasks/task/add/', function ($event) {
+			include('ajax_task_add.php');
+		});
+
+		// Edit will load a form for well, editting the task.
+		wire()->addHook('/millcotasks/task/edit/{board_id}/{task_id}', function ($event) {
+			include('ajax_task_edit.php');
+		});
+
+		// That edit form gets submitted here.
+		wire()->addHook('/millcotasks/task/update/{task_id}', function ($event) {
+			include('ajax_task_update.php');
+		});
+
+		// That edit form gets reset here.
+		wire()->addHook('/millcotasks/task/reset/{task_id}', function ($event) {
+			include('ajax_task_reset.php');
+		});
+		
+		// Delete a task.
+		wire()->addHook('/millcotasks/task/delete/{task_id}', function ($event) {
+			include('ajax_task_delete.php');
+		});
+		
+		// Update sort order for an array of tasks.
+		wire()->addHook('/millcotasks/tasks/sort/', function ($event) {
+			include('ajax_tasks_sort.php');
+		});
+
+
+		// Add JavaScript
+		$info = $this->getModuleInfo();
+		$version = $info['version'];
+		$this->config->scripts->add($this->config->urls->{$this} . "$this.js?v=$version");
+		$this->config->scripts->add($this->config->urls->{$this} . "lib/htmx.min.js?v=$version");
+		$this->config->scripts->add($this->config->urls->{$this} . "lib/Sortable.min.js?v=$version");
+
+	}
+
+	public function ___execute()
+	{
+		// We don't show the manage settings unless you have
+		// the millco-tasks-manage permissions.
+		// TODO - we don't want to show this page at all if you don't have permissions....
+		// must work out how.
+		if (!(wire('user')->hasPermission('millco-tasks-manage'))) {
+			return 'You require additional permissions to edit these settings.';
+		}
+
+		if ($this->input->post('submit')) {
+			$this->mu_save_settings($this->input->post);
+		}
+
+		$admin_page_markup = '';
+		$board=$this->tasks();
+		$admin_page_markup .= wire('files')->render(wire('config')->paths->siteModules . 'MillcoTasks/templates/board.php', ['board'=>$board, 'mt'=>$this]);
+		return $admin_page_markup;
+
+	}
+
+	//ready() method: This is called after ProcessWire is fully bootstrapped, and is about to start rendering a page. At this point, the entire API is available and ready for use. This method can be used when you depend on the current page being accessed, like changing or adding certain behaviors or settings based on the current page or user.
+	public function ready()
+	{
+	}
+
+
+	/**
+	 * Board
+	 * Return board markup for front end template.
+	 * 
+	 */
+
+	public function board($board_id=1){
+
+		$board=$this->tasks();
+		$markup = wire('files')->render(wire('config')->paths->siteModules . 'MillcoTasks/templates/board.php', ['board'=>$board, 'mt'=>$this]);
+
+		return $markup;
+
+	}
+
+
+
+
+	/**
+	 * Add a deck to a board.
+	 * @param Int $board_id
+	 */
+
+	 public function deck_add($board_id){
+
+		$db = $this->wire('database');
+
+		$i = "INSERT INTO `millco_tasks_decks` (`deck_name`,`board_key`) VALUES ('New deck', :board_id);";
+
+		$params = array(":board_id" => $board_id);
+
+		$query = $db->prepare($i);
+		$query->execute($params);
+
+		return $db->lastInsertId();;
+	 }
+
+	 /**
+	 * Update the deck name
+	 * @param Int $deck_id
+	 * @param String $deck_title;
+	 */
+
+	 public function deck_title($deck_id, $deck_name){
+
+		$db = $this->wire('database');
+
+		$u = "UPDATE `millco_tasks_decks` SET deck_name = :deck_name WHERE deck_id = :deck_id LIMIT 1;";
+
+		$params = array(":deck_id" => $deck_id,":deck_name" => $deck_name);
+
+		$query = $db->prepare($u);
+		$query->execute($params);
+
+		return $db->lastInsertId();;
+	 }
+
+
+
+	/**
+	 * Tasks
+	 * Return tasks for a board
+	 */
+
+	public function tasks($board_id=1){
+
+		$board=[];
+		$board_id=(int)$board_id;
+
+		if(!$board_id){
+			return $board;
+		}
+
+		// get decks for this this board
+
+		$db = $this->wire('database');
+
+		$q = "SELECT *
+				FROM `millco_tasks_decks`
+				WHERE board_key= :board_id
+				LIMIT 50
+				";
+	
+
+		$params = array(":board_id" => $board_id);
+
+		$query = $db->prepare($q);
+		$query->execute($params);
+
+		while($row = $query->fetch()){
+
+			$deck=[];
+
+			$deck['deck_name']=$row['deck_name'];
+			$deck['deck_id']=$row['deck_id'];
+
+			$deck_q = "SELECT * 
+			FROM `millco_tasks_tasks`
+			WHERE board_key= :board_id
+			AND deck_key= :deck_id
+			ORDER BY `sort_order` ASC
+			LIMIT 50";
+
+			$params = array(":board_id" => $board_id, ":deck_id"=>$row['deck_id']);
+
+			$dquery = $db->prepare($deck_q);
+			$dquery->execute($params);
+
+			$deck['tasks']=$dquery->fetchAll();
+
+			$board[]=$deck;
+
+		};
+
+		return $board;
+	}
+
+
+	/**
+	 * Add a task
+	 * @param Int $board_key
+	 * @param Int $deck_key
+	 * @param String task_content
+	 * 
+	 */
+
+	public function task_add($board_key,$deck_key,$task_content){
+
+		$db = $this->wire('database');
+
+		$sql = "INSERT INTO `millco_tasks_tasks` (`board_key`, `deck_key`, `task_content`)
+		VALUES (:board_key, :deck_key, :task_content);";
+
+		$params = array(":board_key" => $board_key, ":deck_key"=>$deck_key,":task_content"=>$task_content);
+
+		$query = $db->prepare($sql);
+		$query->execute($params);
+
+		return $db->lastInsertId();;
+
+	}
+
+
+	/**
+	 * Send back a form for editing / adding 
+	 * 
+	 */
+
+	 public function task_form($task_id=-1,$board_id=1,$deck_id=1){
+
+		$form_class='';
+
+		// if we have a task id then get this task from the db
+		if($task_id > 0){
+
+			$task=$this->task_from_id($task_id);
+			// sanity check that the task board id matches what we've been passed.
+			$task_content=$task['task_content'];
+			$board_id=$task['board_key'];
+			$deck_id=$task['deck_key'];
+
+			$form_url='/millcotasks/task/update/'.  $task_id;
+
+		}else{
+			$task_content='';
+			$form_url='/millcotasks/task/add/';
+			$form_class.=' mtef_new';
+		}
+
+		$response='';
+		$response.='<form id="mtef_' . $task_id .'" class="mt_edit_form ' . $form_class . '" hx-post="' . $form_url .'" hx-swap="outerHTML">';
+
+			$response.='<input type="hidden" name="board_id" value="' . $board_id .'">';
+			$response.='<input type="hidden" name="deck_id" value="' . $deck_id .'">';
+			$response.='<input type="hidden" name="task_id" value="' . $task_id .'">';
+
+			$response.='<textarea name="task_content" required>' . $task_content . '</textarea>';
+
+			$response.='<div class="mtef_butts">';
+
+			// only show a cancel button if this is proper task and not for new tasks.
+			if($task_id > 0){
+				$response.='<button hx-post="/millcotasks/task/reset/'.  $task_id . '" hx-target="#mtef_' . $task_id .'"t>cancel</button>';
+				$response.='<button hx-post="/millcotasks/task/delete/'.  $task_id . '" hx-target="#mtef_' . $task_id .'"t>delete</button>';
+				$response.='<button type=submit>save</button>';
+			}else{
+				$response.='<button type=submit>+</button>';
+			}
+
+			$response.='</div>';
+		$response.='</form>';
+		
+		return $response;
+
+	}
+
+	/**
+	 * Task markup
+	 * @param $task Array;
+	 */
+	public function task_markup($task){
+
+		$response='';
+
+		// ooh could we do some markdown here?
+		$task_content=nl2br($task['task_content']);
+
+		$response.= '<div tabindex="0" class="mt_task"  data-task_id="' . $task['task_id'] . '" data-hx-post="/millcotasks/task/edit/' . $task['board_key'] . '/' . $task['task_id'] .'" hx-trigger="click,keyup[keyCode==13]" hx-swap="outerHTML">';
+			$response.= '<div class="mt_task_content">' . $task_content . '</div>';
+		$response.= '</div>';
+
+		return $response;
+	}
+
+
+	/**
+	* Get a task from its id
+	* 
+	*/
+
+	 public function task_from_id($task_id){
+
+		$db = $this->wire('database');
+		$q = "SELECT *
+				FROM `millco_tasks_tasks`
+				WHERE task_id= :task_id
+				LIMIT 1
+				";
+	
+
+		$params = array(":task_id" => $task_id);
+
+		$query = $db->prepare($q);
+		$query->execute($params);
+
+		$task_row=$query->fetch();
+		
+		return $task_row;
+
+	}
+
+	/**
+	 * Task update
+	 * @param Int $task_id 
+	 * @param String $task_content
+	*/
+
+	public function task_delete($task_id){
+
+		$db = $this->wire('database');
+		$q = "DELETE FROM `millco_tasks_tasks`
+			WHERE task_id= :task_id
+			LIMIT 1
+			";
+	
+
+		$params = array(":task_id" => $task_id);
+
+		$updated = $db->prepare($q);
+		$result=$updated->execute($params);
+
+		return $result;
+
+
+	}
+
+	
+
+	/**
+	 * Task update
+	 * @param Int $task_id 
+	 * @param String $task_content
+	*/
+
+	public function task_update($task_id, $task_content){
+
+		$db = $this->wire('database');
+		$q = "UPDATE `millco_tasks_tasks`
+			SET  task_content=:task_content
+			WHERE task_id= :task_id
+			LIMIT 1
+			";
+	
+
+		$params = array(":task_id" => $task_id, ":task_content" => $task_content);
+
+		$updated = $db->prepare($q);
+		$result=$updated->execute($params);
+
+		return $result;
+
+
+	}
+
+	/**
+	 * Task update sort order
+	 * Also now updates deck in case we've dragged a task to a new deck.
+	 * @param Int $task_id 
+	 * @param Int $sort_order
+	 * @param Int $deck_key
+	*/
+
+	public function task_update_sort_order($task_id, $sort_order, $deck_key){
+
+
+		$db = $this->wire('database');
+		$q = "UPDATE `millco_tasks_tasks`
+			SET  deck_key=:deck_key,
+			 sort_order=:sort_order
+			WHERE task_id= :task_id
+			LIMIT 1
+			";
+	
+
+		$params = array(":task_id" => $task_id, ":deck_key" => $deck_key, ":sort_order" => $sort_order);
+
+		$updated = $db->prepare($q);
+		$result=$updated->execute($params);
+
+		return $result;
+
+
+	}
+
+
+
+
+	public function ___install() {
+		$database = $this->wire('database');
+
+		$sql = "CREATE TABLE IF NOT EXISTS `millco_tasks_boards` (
+			`board_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+			`board_name` VARCHAR(255) NOT NULL
+		);
+		
+		INSERT INTO `millco_tasks_boards` (`board_name`) VALUES ('Tasks');";
+	
+		try {
+			$database->exec($sql);
+		} catch(Exception $e) {
+			$this->message("Could not create table: ".$e->getMessage());
+		}
+
+		$sql = "CREATE TABLE IF NOT EXISTS `millco_tasks_decks` (
+			`deck_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+			`board_key` INT(10) NOT NULL,
+			`deck_name` VARCHAR(255) NOT NULL
+		);
+		
+		INSERT INTO `millco_tasks_decks` (`deck_name`,`board_key`) VALUES ('Deck 1', 1);";
+	
+		try {
+			$database->exec($sql);
+		} catch(Exception $e) {
+			$this->message("Could not create table: ".$e->getMessage());
+		}
+	
+		$sql = "CREATE TABLE IF NOT EXISTS `millco_tasks_tasks` (
+			`task_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+			`board_key` INT(10) NOT NULL,
+			`deck_key` INT(10) NOT NULL,
+			`sort_order` INT(10) NOT NULL,
+			`task_content` TEXT NOT NULL
+		)";
+	
+		try {
+			$database->exec($sql);
+		} catch(Exception $e) {
+			$this->message("Could not create table: ".$e->getMessage());
+		}
+
+		// Ooooh - can we trust that the first board we created is always 1?
+		$sql = "INSERT INTO `millco_tasks_tasks` (`board_key`, `deck_key`, `task_content`)
+		VALUES ('1', '1', 'Another pretend bit of content.');
+		";
+	
+		try {
+			$database->exec($sql);
+		} catch(Exception $e) {
+			$this->message("Could not create table: ".$e->getMessage());
+		}
+
+
+		
+
+
+	}
+
+	public function ___uninstall() {
+
+		$database = $this->wire('database');
+	
+		$sql = "DROP TABLE `millco_tasks_boards`;
+				DROP TABLE `millco_tasks_decks`;
+				DROP TABLE `millco_tasks_tasks`";
+	
+		try {
+			$database->exec($sql);
+		} catch(Exception $e) {
+			$this->message("Could not drop table: ".$e->getMessage());
+		}
+	}
+
+	
+
+}
