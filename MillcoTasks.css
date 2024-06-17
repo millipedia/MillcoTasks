@@ -6,7 +6,10 @@
 	--mt_grey_mid: hsl(0, 0%, 50%);
 	--mt_grey_light: hsl(0, 0%, 94%);
 
+	--mt_dark: hsl(0, 0%, 15%);
 	--mt_pale: hsl(0, 0%, 99%);
+
+	--mt_transition: all 0.3s ease-in-out;
 
 }
 
@@ -15,6 +18,7 @@
 	width:100%;
 	overflow-y: auto;
 	gap:var(--mt_gap);
+	padding-bottom: var(--mt_gap);
 }
 
 
@@ -54,7 +58,6 @@
 
 .mt_edit_form textarea{
 	width:100%;
-	min-width: 312px;
 	max-width: 320px;
 }
 
@@ -71,6 +74,7 @@
 
 .mt_new_deck{
 	width:36px;
+	min-width: 36px;
 	height:36px;
 	display: flex;
 	border:4px solid var(--mt_grey_mid);
@@ -83,4 +87,9 @@
 	line-height: 1;
 	border-radius: 6px;
 	cursor:pointer;
+}
+
+.mt_new_deck:hover{
+	background-color: var(--mt_dark);
+	transition:var(--transition);
 }

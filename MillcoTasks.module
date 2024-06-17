@@ -168,8 +168,13 @@ class MillcoTasks extends Process implements Module, ConfigurableModule
 
 	public function board($board_id=1){
 
-		$board=$this->tasks();
-		$markup = wire('files')->render(wire('config')->paths->siteModules . 'MillcoTasks/templates/board.php', ['board'=>$board, 'mt'=>$this]);
+		$board=$this->tasks($board_id);
+		$markup='';
+		$markup.='<script src="' . $this->config->urls->{$this} . 'MillcoTasks.js"></script>';
+		$markup.='<script src="' . $this->config->urls->{$this} . 'lib/htmx.min.js"></script>';
+		$markup.='<script src="' . $this->config->urls->{$this} . 'lib/Sortable.min.js"></script>';
+
+		$markup.= wire('files')->render(wire('config')->paths->siteModules . 'MillcoTasks/templates/board.php', ['board'=>$board, 'mt'=>$this]);
 
 		return $markup;
 
