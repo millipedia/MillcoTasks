@@ -1,4 +1,4 @@
-:root{
+:root {
 	--mt_gap: 1rem;
 	--mt_gap_small: 0.5rem;
 
@@ -13,83 +13,98 @@
 
 }
 
-.mt_board{
-	display:flex;
-	width:100%;
+.mt_board {
+	display: flex;
+	width: 100%;
 	overflow-y: auto;
-	gap:var(--mt_gap);
+	gap: var(--mt_gap);
 	padding-bottom: var(--mt_gap);
+	max-height: calc(100vh - 240px);
 }
 
 
-.mt_deck{
+.mt_deck {
 	min-width: 320px;
 	max-width: 328px;
-	border:1px solid var(--mt_grey_mid);
-	background-color:  var(--mt_grey_light);
+	max-height: 100%;
+	overflow: auto;
+	border: 1px solid var(--mt_grey_mid);
+	background-color: var(--mt_grey_light);
 	border-radius: 6px;
-	padding:var(--mt_gap_small);
+	padding: var(--mt_gap_small);
 	display: flex;
 	flex-direction: column;
 	gap: var(--mt_gap_small);
 }
 
-.deck_title{
-	border:0;
+.deck_title {
+	border: 0;
 	border-bottom: 1px solid var(--mt_grey_mid);
 	background-color: transparent;
 	font-weight: 700;
 }
 
-.mt_task{
+.mt_task {
 	max-width: 320px;
-	border:1px solid var(--mt_grey_dark);
-	background-color:var(--mt_pale);
+	border: 1px solid var(--mt_grey_dark);
+	background-color: var(--mt_pale);
 	border-radius: 6px;
-	padding:var(--mt_gap_small);
+	padding: var(--mt_gap_small);
 	border-radius: 4px;
 }
 
-.mt_edit_form{
+.mt_task_content {
+	font-size: 0.875rem;
+	font-weight: 7400;
+}
+
+.mt_task_content::first-line {
+	font-size: 1rem;
+	font-weight: 700;
+}
+
+
+.mt_edit_form {
 	display: flex;
 	flex-direction: column;
-	gap:var(--mt_gap_small);
+	gap: var(--mt_gap_small);
 }
 
-.mt_edit_form textarea{
-	width:100%;
+.mt_edit_form textarea {
+	width: 100%;
 	max-width: 320px;
+	height: 4rem;
 }
 
-.mtef_butts{
+.mtef_butts {
 	display: flex;
 	justify-content: end;
-	gap:var(--mt_gap_small);
+	gap: var(--mt_gap_small);
 }
 
-.mtef_new{
+.mtef_new {
 	border-top: 4px dotted var(--mt_grey_mid);
 	padding-top: var(--mt_gap_small);
 }
 
-.mt_new_deck{
-	width:36px;
+.mt_new_deck {
+	width: 36px;
 	min-width: 36px;
-	height:36px;
+	height: 36px;
 	display: flex;
-	border:4px solid var(--mt_grey_mid);
+	border: 4px solid var(--mt_grey_mid);
 	align-items: start;
 	justify-content: center;
 	background-color: var(--mt_pale);
-	color:var(--mt_grey_mid);
+	color: var(--mt_grey_mid);
 	font-weight: 800;
-	font-size:26px;
+	font-size: 26px;
 	line-height: 1;
 	border-radius: 6px;
-	cursor:pointer;
+	cursor: pointer;
 }
 
-.mt_new_deck:hover{
+.mt_new_deck:hover {
 	background-color: var(--mt_dark);
-	transition:var(--transition);
+	transition: var(--transition);
 }
