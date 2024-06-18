@@ -20,7 +20,7 @@ class MillcoTasks extends Process implements Module, ConfigurableModule
 			'title' => 'MillcoTasks',
 			'summary' => 'Card board.',
 			'version' => 1,
-			'autoload' => false,
+			'autoload' => true,
 			'singular' => true,
 			'permanent' => false,
 			'permission' => 'millco-tasks',
@@ -30,23 +30,12 @@ class MillcoTasks extends Process implements Module, ConfigurableModule
 			),
 
 			'icon' => 'check-square-o',
-			// page that you want created to execute this module
 			'page' => [
 				'name' => 'millcotasks',
 				'parent' => 'setup',
 				'title' => 'Tasks',
 				'permission' => 'millco-tasks-manage',
 			],
-			// Me trying and failing to add permissions to the 
-			// page created under setup
-			// 'useNavJSON' => true, 
-			// 'nav' => [
-			// 	[
-			// 	  'url' => '', 
-			// 	  'label' => __('tasks'),
-			// 	  'permission' => 'millco-tasks-manage',
-			// 	],
-			// ],
 			'requires' => [
 				'PHP>=8.0.0',
 				'ProcessWire>=3.0.16',
