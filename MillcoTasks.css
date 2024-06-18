@@ -23,6 +23,12 @@
 }
 
 
+.mt_board button{
+	border:1px solid var(--mt_grey_dark);
+	border-radius: 4px;
+	cursor: pointer;
+}
+
 .mt_deck {
 	min-width: 320px;
 	max-width: 328px;
@@ -55,7 +61,7 @@
 
 .mt_task_content {
 	font-size: 0.875rem;
-	font-weight: 7400;
+	font-weight: 400;
 }
 
 .mt_task_content::first-line {
@@ -73,7 +79,11 @@
 .mt_edit_form textarea {
 	width: 100%;
 	max-width: 320px;
-	height: 4rem;
+	min-height: 4rem;
+	padding:0.5rem;
+	font-size: 1rem;
+	line-height: 1.2;
+	font-family: sans-serif;
 }
 
 .mtef_butts {
