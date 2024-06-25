@@ -369,8 +369,14 @@ class MillcoTasks extends Process implements Module, ConfigurableModule
 
 		$response='';
 
-		// ooh could we do some markdown here?
-		$task_content=nl2br($task['task_content']);
+		$task_content=$task['task_content'];
+
+		// this sanitizer markdown seems to work for what we want.. .which is nice
+		// TODO: markdown should be an option I guess.
+		$task_content=wire('sanitizer')->entitiesMarkdown($task_content);
+		
+		// still need nl2br though.
+		$task_content=nl2br($task_content);
 
 		$response.= '<div tabindex="0" class="mt_task"  data-task_id="' . $task['task_id'] . '" data-hx-post="/millcotasks/task/edit/' . $task['board_key'] . '/' . $task['task_id'] .'" hx-trigger="click,keyup[keyCode==13]" hx-swap="outerHTML">';
 			$response.= '<div class="mt_task_content">' . $task_content . '</div>';
