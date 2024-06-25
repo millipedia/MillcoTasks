@@ -12,14 +12,12 @@ namespace ProcessWire;
 class MillcoTasks extends Process implements Module, ConfigurableModule
 {
 
-	public $mu_settings; // some sitewide settings.
-
 	public static function getModuleInfo()
 	{
 		return [
 			'title' => 'MillcoTasks',
 			'summary' => 'Card board.',
-			'version' => 1,
+			'version' => 2,
 			'autoload' => true,
 			'singular' => true,
 			'permanent' => false,
@@ -28,7 +26,6 @@ class MillcoTasks extends Process implements Module, ConfigurableModule
 				'millco-tasks' => 'Millco tasks',
 				'millco-tasks-manage' => 'Manage Millco tasks'
 			),
-
 			'icon' => 'check-square-o',
 			'page' => [
 				'name' => 'millcotasks',
@@ -51,7 +48,7 @@ class MillcoTasks extends Process implements Module, ConfigurableModule
 	}
 
 	static protected $defaults = array(
-		'top' => ''
+		'use_markdown' => '1'
 	);
 
 	public function __construct()
@@ -70,7 +67,6 @@ class MillcoTasks extends Process implements Module, ConfigurableModule
 		/** @var MillcoTasks $this */
 
 		// Add routes for our ajax callls
-
 
 		// Add a deck
 		wire()->addHook('/millcotasks/deck/add/{board_id}', function ($event) {
@@ -124,8 +120,7 @@ class MillcoTasks extends Process implements Module, ConfigurableModule
 
 	public function ___execute()
 	{
-		// We don't show the manage settings unless you have
-		// the millco-tasks-manage permissions.
+
 		// TODO - we don't want to show this page at all if you don't have permissions....
 		// must work out how.
 		if (!(wire('user')->hasPermission('millco-tasks-manage'))) {
@@ -152,6 +147,8 @@ class MillcoTasks extends Process implements Module, ConfigurableModule
 	/**
 	 * Board
 	 * Return board markup for front end template.
+	 * @param Int $board_id
+	 * @return String $markup
 	 * 
 	 */
 
