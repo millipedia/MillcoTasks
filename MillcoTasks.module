@@ -48,7 +48,9 @@ class MillcoTasks extends Process implements Module, ConfigurableModule
 	}
 
 	static protected $defaults = array(
-		'use_markdown' => '1'
+		'use_markdown' => '1',
+		'include_htmx' => '1',
+		'include_draggable' => '1'
 	);
 
 	public function __construct()
