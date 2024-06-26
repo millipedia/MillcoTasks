@@ -28,5 +28,4 @@ and you can style that however you want.
 ## Things it doesn't do yet but will soon
 
 - [ ] Board management. Need to be able to add and remove boards
-- [ ] Hmmm... I seem to have broken something so an admin page isn't created automagically .. ought to fix that
 - [ ] Needs config setting not to load htmx / sortable if you already load it.
