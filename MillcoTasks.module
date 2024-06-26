@@ -9,7 +9,7 @@ namespace ProcessWire;
  */
 
 
-class MillcoTasks extends Process implements Module, ConfigurableModule
+class MillcoTasks extends WireData implements Module, ConfigurableModule
 {
 
 	public static function getModuleInfo()
@@ -17,26 +17,17 @@ class MillcoTasks extends Process implements Module, ConfigurableModule
 		return [
 			'title' => 'MillcoTasks',
 			'summary' => 'Card board.',
-			'version' => 2,
+			'version' => 3,
 			'autoload' => true,
 			'singular' => true,
 			'permanent' => false,
 			'permission' => 'millco-tasks',
-			'permissions' => array(
-				'millco-tasks' => 'Millco tasks',
-				'millco-tasks-manage' => 'Manage Millco tasks'
-			),
 			'icon' => 'check-square-o',
-			'page' => [
-				'name' => 'millcotasks',
-				'parent' => 'setup',
-				'title' => 'Tasks',
-				'permission' => 'millco-tasks-manage',
-			],
 			'requires' => [
 				'PHP>=8.0.0',
 				'ProcessWire>=3.0.16',
 			],
+			'installs' => ['ProcessMillcoTasks']
 		];
 	}
 
@@ -120,25 +111,25 @@ class MillcoTasks extends Process implements Module, ConfigurableModule
 
 	}
 
-	public function ___execute()
-	{
+	// public function ___execute()
+	// {
 
-		// TODO - we don't want to show this page at all if you don't have permissions....
-		// must work out how.
-		if (!(wire('user')->hasPermission('millco-tasks-manage'))) {
-			return 'You require additional permissions to edit these settings.';
-		}
+	// 	// TODO - we don't want to show this page at all if you don't have permissions....
+	// 	// must work out how.
+	// 	if (!(wire('user')->hasPermission('millco-tasks-manage'))) {
+	// 		return 'You require additional permissions to edit these settings.';
+	// 	}
 
-		if ($this->input->post('submit')) {
-			$this->mu_save_settings($this->input->post);
-		}
+	// 	if ($this->input->post('submit')) {
+	// 		$this->mu_save_settings($this->input->post);
+	// 	}
 
-		$admin_page_markup = '';
-		$board=$this->tasks();
-		$admin_page_markup .= wire('files')->render(wire('config')->paths->siteModules . 'MillcoTasks/templates/board.php', ['board'=>$board, 'mt'=>$this]);
-		return $admin_page_markup;
+	// 	$admin_page_markup = '';
+	// 	$board=$this->tasks();
+	// 	$admin_page_markup .= wire('files')->render(wire('config')->paths->siteModules . 'MillcoTasks/templates/board.php', ['board'=>$board, 'mt'=>$this]);
+	// 	return $admin_page_markup;
 
-	}
+	// }
 
 	//ready() method: This is called after ProcessWire is fully bootstrapped, and is about to start rendering a page. At this point, the entire API is available and ready for use. This method can be used when you depend on the current page being accessed, like changing or adding certain behaviors or settings based on the current page or user.
 	public function ready()
@@ -167,8 +158,6 @@ class MillcoTasks extends Process implements Module, ConfigurableModule
 		return $markup;
 
 	}
-
-
 
 
 	/**
@@ -483,10 +472,8 @@ class MillcoTasks extends Process implements Module, ConfigurableModule
 
 	}
 
-
-
-
 	public function ___install() {
+
 		$database = $this->wire('database');
 
 		$sql = "CREATE TABLE IF NOT EXISTS `millco_tasks_boards` (
@@ -541,11 +528,11 @@ class MillcoTasks extends Process implements Module, ConfigurableModule
 			$this->message("Could not create table: ".$e->getMessage());
 		}
 
-
-		
+	return true;
 
 
 	}
+
 
 	public function ___uninstall() {
 
@@ -560,6 +547,8 @@ class MillcoTasks extends Process implements Module, ConfigurableModule
 		} catch(Exception $e) {
 			$this->message("Could not drop table: ".$e->getMessage());
 		}
+
+		return true;
 	}
 
 	
