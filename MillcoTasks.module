@@ -284,6 +284,30 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 
 	}
 
+	/**
+	 * Task delete
+	 * @param Int $task_id 
+	*/
+
+	public function task_delete($task_id){
+
+		$db = $this->wire('database');
+		$q = "DELETE FROM `millco_tasks_tasks`
+			WHERE task_id= :task_id
+			LIMIT 1
+			";
+	
+
+		$params = array(":task_id" => $task_id);
+
+		$updated = $db->prepare($q);
+		$result=$updated->execute($params);
+
+		return $result;
+
+
+	}
+
 
 	/**
 	 * Send back a form for editing / adding 
@@ -325,7 +349,7 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 			// only show a cancel button if this is proper task and not for new tasks.
 			if($task_id > 0){
 				$response.='<button hx-post="/millcotasks/task/reset/'.  $task_id . '" hx-target="#mtef_' . $task_id .'"t>cancel</button>';
-				$response.='<button hx-post="/millcotasks/task/delete/'.  $task_id . '" hx-target="#mtef_' . $task_id .'"t>delete</button>';
+				$response.='<button hx-post="/millcotasks/task/delete/'.  $task_id . '" hx-confirm="Delete this item?" hx-target="#mtef_' . $task_id .'"t>delete</button>';
 				$response.='<button type=submit>save</button>';
 			}else{
 				$response.='<button type=submit>+</button>';
@@ -389,31 +413,7 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 
 	}
 
-	/**
-	 * Task update
-	 * @param Int $task_id 
-	 * @param String $task_content
-	*/
-
-	public function task_delete($task_id){
-
-		$db = $this->wire('database');
-		$q = "DELETE FROM `millco_tasks_tasks`
-			WHERE task_id= :task_id
-			LIMIT 1
-			";
 	
-
-		$params = array(":task_id" => $task_id);
-
-		$updated = $db->prepare($q);
-		$result=$updated->execute($params);
-
-		return $result;
-
-
-	}
-
 	
 
 	/**
