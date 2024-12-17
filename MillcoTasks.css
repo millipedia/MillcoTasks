@@ -80,6 +80,7 @@
 	width: 100%;
 	max-width: 320px;
 	min-height: 4rem;
+	height: fit-content;
 	padding:0.5rem;
 	font-size: 1rem;
 	line-height: 1.2;
@@ -118,3 +119,4 @@
 	background-color: var(--mt_dark);
 	transition: var(--transition);
 }
+
