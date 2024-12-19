@@ -101,6 +101,11 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 			include('ajax_tasks_sort.php');
 		});
 
+		// Update sort order for an array of decks.
+		wire()->addHook('/millcotasks/decks/sort/', function ($event) {
+			include('ajax_decks_sort.php');
+		});
+
 
 		// Add JavaScript
 		$info = $this->getModuleInfo();
@@ -179,6 +184,34 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		return $db->lastInsertId();;
 	 }
 
+
+	/**
+	 * Decks update sort order
+	 * 
+	 * @param Int $deck_id 
+	 * @param Int $deck_order
+	 * @param Int $board_key (in case we ever manage to implement multiple boards.)
+	*/
+
+	public function decks_update_sort_order($deck_id, $deck_order, $board_key=1){
+
+		$db = $this->wire('database');
+		$q = "UPDATE `millco_tasks_decks`
+			SET  board_key=:board_key,
+			 deck_order=:deck_order
+			WHERE deck_id= :deck_id
+			LIMIT 1
+			";
+	
+		$params = array(":deck_id" => $deck_id, ":board_key" => $board_key, ":deck_order" => $deck_order);
+
+		$updated = $db->prepare($q);
+		$result=$updated->execute($params);
+
+		return $result;
+
+	}
+
 	 /**
 	 * Update the deck name
 	 * @param Int $deck_id
@@ -222,6 +255,7 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		$q = "SELECT *
 				FROM `millco_tasks_decks`
 				WHERE board_key= :board_id
+				ORDER BY `deck_order`
 				LIMIT 50
 				";
 	
@@ -468,7 +502,6 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		$result=$updated->execute($params);
 
 		return $result;
-
 
 	}
 
