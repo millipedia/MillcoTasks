@@ -25,10 +25,14 @@ $board_id = 1; // we just have single boards at the mo, but one day....
 	foreach ($board as $deck) {
 
 		echo '<div id="deck_' . $tick . '" data-deck_id="' . $deck['deck_id'] . '" class="mt_deck">';
+		echo '<header class="deck_header">';
 		echo '<input class="deck_title" name="deck_title" 
 		data-hx-post="/millcotasks/deck/title/' . $deck['deck_id'] . '"
 		hx-trigger="blur changed"
 		 value="' . $deck['deck_name'] . '">';
+
+		 echo '<div class="deck_handle">H</div>';
+		 echo '</header>';
 
 		foreach ($deck['tasks'] as $task) {
 			echo $mt->task_markup($task);
@@ -73,6 +77,7 @@ $board_id = 1; // we just have single boards at the mo, but one day....
 		animation: 150,
 		group: "mt_boards",
 		draggable: ".mt_deck",
+		handle: '.deck_handle',
 		onEnd: function(evt) {
 
 			deck_order();

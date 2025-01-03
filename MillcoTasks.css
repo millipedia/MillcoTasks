@@ -23,8 +23,8 @@
 }
 
 
-.mt_board button{
-	border:1px solid var(--mt_grey_dark);
+.mt_board button {
+	border: 1px solid var(--mt_grey_dark);
 	border-radius: 4px;
 	cursor: pointer;
 }
@@ -43,11 +43,37 @@
 	gap: var(--mt_gap_small);
 }
 
+.deck_header {
+	display: flex;
+}
+
 .deck_title {
 	border: 0;
 	border-bottom: 1px solid var(--mt_grey_mid);
 	background-color: transparent;
 	font-weight: 700;
+	flex: 1;
+}
+
+.deck_handle {
+	min-width: 24px;
+	display: inline-block;
+	--svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23000' d='m25 11l-1.41 1.41L26.17 15H17V5.83l2.59 2.58L21 7l-5-5l-5 5l1.41 1.41L15 5.83V15H5.83l2.58-2.59L7 11l-5 5l5 5l1.41-1.41L5.83 17H15v9.17l-2.59-2.58L11 25l5 5l5-5l-1.41-1.41L17 26.17V17h9.17l-2.58 2.59L25 21l5-5z'/%3E%3C/svg%3E");
+	background-color: currentColor;
+	background-size: 16px 16px;
+	background-position: center;
+	-webkit-mask-image: var(--svg);
+	mask-image: var(--svg);
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
+	cursor: grab;
+}
+
+
+.deck_handle:hover {
+	color:red;
 }
 
 .mt_task {
@@ -81,7 +107,7 @@
 	max-width: 320px;
 	min-height: 4rem;
 	height: fit-content;
-	padding:0.5rem;
+	padding: 0.5rem;
 	font-size: 1rem;
 	line-height: 1.2;
 	font-family: sans-serif;
@@ -119,4 +145,3 @@
 	background-color: var(--mt_dark);
 	transition: var(--transition);
 }
-
