@@ -88,6 +88,7 @@
 .mt_task_content {
 	font-size: 0.875rem;
 	font-weight: 400;
+	overflow: auto;
 }
 
 .mt_task_content::first-line {
