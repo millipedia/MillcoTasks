@@ -17,7 +17,7 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		return [
 			'title' => 'MillcoTasks',
 			'summary' => 'Card board.',
-			'version' => 3,
+			'version' => 4,
 			'autoload' => true,
 			'singular' => true,
 			'permanent' => false,
@@ -584,6 +584,30 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		return true;
 	}
 
+
+	/**
+	 * Upgrade
+	 */
+
+	public function ___upgrade($fromVersion, $toVersion) {
+
+		if(version_compare($fromVersion, "4", "<=")) {
+
+			$database = $this->wire('database');
+
+			$sql = "ALTER TABLE `millco_tasks_decks` ADD `deck_order` int NOT NULL;";
+		
+			try {
+				$database->exec($sql);
+
+				$this->log("Added deck_order to decks table");
+
+			} catch(Exception $e) {
+				$this->message("Could not update table: ".$e->getMessage());
+			}
+
+		}
+	}
 	
 
 }

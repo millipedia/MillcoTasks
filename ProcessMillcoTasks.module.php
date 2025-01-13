@@ -46,8 +46,9 @@ class ProcessMillcoTasks extends Process implements Module
 	public function ___execute()
 	{
 
-
 		$mt = $this->modules->get('MillcoTasks');
+		
+		/** @var MillcoTasks $mt*/
 		$markup=$mt->board(1);
 		
 		return $markup;
