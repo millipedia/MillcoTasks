@@ -525,7 +525,8 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		$sql = "CREATE TABLE IF NOT EXISTS `millco_tasks_decks` (
 			`deck_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 			`board_key` INT(10) NOT NULL,
-			`deck_name` VARCHAR(255) NOT NULL
+			`deck_name` VARCHAR(255) NOT NULL,
+			`deck_order` INT(10) NOT NULL
 		);
 		
 		INSERT INTO `millco_tasks_decks` (`deck_name`,`board_key`) VALUES ('Deck 1', 1);";
