@@ -35,6 +35,8 @@ $board_id = 1; // we just have single boards at the mo, but one day....
 		 echo '</header>';
 
 		foreach ($deck['tasks'] as $task) {
+
+			/** @var MillcoTasks $mt */
 			echo $mt->task_markup($task);
 		}
 

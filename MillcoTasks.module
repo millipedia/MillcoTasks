@@ -17,7 +17,7 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		return [
 			'title' => 'MillcoTasks',
 			'summary' => 'Card board.',
-			'version' => 4,
+			'version' => 5,
 			'autoload' => true,
 			'singular' => true,
 			'permanent' => false,
@@ -306,10 +306,13 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 
 		$db = $this->wire('database');
 
-		$sql = "INSERT INTO `millco_tasks_tasks` (`board_key`, `deck_key`, `task_content`)
-		VALUES (:board_key, :deck_key, :task_content);";
+		// Even if the user is not logged in, this will be the guest user id.
+		$user_key = wire('user')->id;
 
-		$params = array(":board_key" => $board_key, ":deck_key"=>$deck_key,":task_content"=>$task_content);
+		$sql = "INSERT INTO `millco_tasks_tasks` (`board_key`, `deck_key`, `task_content`, `user_key`)
+		VALUES (:board_key, :deck_key, :task_content, :user_key);";
+
+		$params = array(":board_key" => $board_key, ":deck_key"=>$deck_key,":task_content"=>$task_content, ":user_key"=>$user_key);
 
 		$query = $db->prepare($sql);
 		$query->execute($params);
@@ -326,12 +329,22 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 	public function task_delete($task_id){
 
 		$db = $this->wire('database');
+
+		// delete replies first.
+		$q = "DELETE FROM `millco_tasks_replies`
+		WHERE task_id= :task_id	";
+
+		$params = array(":task_id" => $task_id);
+
+		$updated = $db->prepare($q);
+		$result=$updated->execute($params);
+
+		// now delete the task.
 		$q = "DELETE FROM `millco_tasks_tasks`
 			WHERE task_id= :task_id
 			LIMIT 1
 			";
 	
-
 		$params = array(":task_id" => $task_id);
 
 		$updated = $db->prepare($q);
@@ -415,7 +428,17 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 
 		$response.= '<div tabindex="0" class="mt_task"  data-task_id="' . $task['task_id'] . '" data-hx-post="/millcotasks/task/edit/' . $task['board_key'] . '/' . $task['task_id'] .'" hx-trigger="click,keyup[keyCode==13]" hx-swap="outerHTML">';
 			$response.= '<div class="mt_task_content">' . $task_content . '</div>';
+
+			if($task['user_key']){
+				$response.= '<div class="mt_meta">';
+				$response.='<div class="mt_meta_user">' . wire('users')->get($task['user_key'])->name . '</div>';
+				$response.='<div class="mt_meta_time">' . $task['task_time'] . '</div>';
+				$response.='</div>';
+			}
+
 		$response.= '</div>';
+
+
 
 		return $response;
 	}
@@ -542,7 +565,9 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 			`board_key` INT(10) NOT NULL,
 			`deck_key` INT(10) NOT NULL,
 			`sort_order` INT(10) NOT NULL,
-			`task_content` TEXT NOT NULL
+			`task_content` TEXT NOT NULL,
+			`user_key` INT(10) NULL,
+			`task_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 		)";
 	
 		try {
@@ -552,14 +577,30 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		}
 
 		// Ooooh - can we trust that the first board we created is always 1?
-		$sql = "INSERT INTO `millco_tasks_tasks` (`board_key`, `deck_key`, `task_content`)
-		VALUES ('1', '1', 'Another pretend bit of content.');
+		$user_key = wire('user')->id;
+		$sql = "INSERT INTO `millco_tasks_tasks` (`board_key`, `deck_key`, `task_content`, `user_key`)
+		VALUES ('1', '1', 'Welcome to the task board!', $user_key);
 		";
 	
 		try {
 			$database->exec($sql);
 		} catch(Exception $e) {
 			$this->message("Could not create table: ".$e->getMessage());
+		}
+
+
+		$sql = "CREATE TABLE IF NOT EXISTS `millco_tasks_replies` (
+			`reply_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+			`task_id` INT(10) NOT NULL,
+			`reply_content` TEXT NOT NULL,
+			`reply_date` DATETIME NOT NULL,
+			`user_key` INT(10) NOT NULL
+		)";
+	
+		try {
+			$database->exec($sql);
+		} catch(Exception $e) {
+			$this->message("Could not create replies table: ".$e->getMessage());
 		}
 
 	return true;
@@ -592,7 +633,7 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 
 	public function ___upgrade($fromVersion, $toVersion) {
 
-		if(version_compare($fromVersion, "4", "<=")) {
+		if(version_compare($fromVersion, "4", "<")) {
 
 			$database = $this->wire('database');
 
@@ -605,6 +646,37 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 
 			} catch(Exception $e) {
 				$this->message("Could not update table: ".$e->getMessage());
+			}
+
+		}
+
+		if(version_compare($fromVersion, "5", "<")) {
+
+			$database = $this->wire('database');
+
+			$sql = "ALTER TABLE `millco_tasks_tasks` ADD `task_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, ADD `user_key` INT(10) NULL;";
+		
+			try {
+				$database->exec($sql);
+
+				$this->log("Added task_time and user_key to tasks table");
+
+			} catch(Exception $e) {
+				$this->message("Could not update table: ".$e->getMessage());
+			}
+
+			$sql = "CREATE TABLE IF NOT EXISTS `millco_tasks_replies` (
+				`reply_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+				`task_id` INT(10) NOT NULL,
+				`reply_content` TEXT NOT NULL,
+				`reply_date` DATETIME NOT NULL,
+				`user_key` INT(10) NOT NULL
+			)";
+		
+			try {
+				$database->exec($sql);
+			} catch(Exception $e) {
+				$this->message("Could not create replies table: ".$e->getMessage());
 			}
 
 		}

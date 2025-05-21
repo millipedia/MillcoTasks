@@ -96,6 +96,11 @@
 	font-weight: 700;
 }
 
+.mt_meta {
+	font-size: 0.5rem;
+	text-align: right;
+	padding-top: 0.25rem;
+}
 
 .mt_edit_form {
 	display: flex;

@@ -20,8 +20,6 @@ if(wire('input')->post('task_id')){
 		$response='Could not delete task.';
 	}
 
-
-
 }else{
 	$response='missing task id';
 }
