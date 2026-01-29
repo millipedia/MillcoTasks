@@ -395,11 +395,11 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 
 			// only show a cancel button if this is proper task and not for new tasks.
 			if($task_id > 0){
-				$response.='<button hx-post="/millcotasks/task/reset/'.  $task_id . '" hx-target="#mtef_' . $task_id .'"t>cancel</button>';
-				$response.='<button hx-post="/millcotasks/task/delete/'.  $task_id . '" hx-confirm="Delete this item?" hx-target="#mtef_' . $task_id .'"t>delete</button>';
-				$response.='<button type=submit>save</button>';
+				$response.='<button class="uk-button uk-button-small" hx-post="/millcotasks/task/reset/'.  $task_id . '" hx-target="#mtef_' . $task_id .'"t>cancel</button>';
+				$response.='<button class="uk-button uk-button-small" hx-post="/millcotasks/task/delete/'.  $task_id . '" hx-confirm="Delete this item?" hx-target="#mtef_' . $task_id .'"t>delete</button>';
+				$response.='<button class="uk-button uk-button-small" type=submit>save</button>';
 			}else{
-				$response.='<button type=submit>+</button>';
+				$response.='<button class="uk-button uk-button-small" type=submit>+</button>';
 			}
 
 			$response.='</div>';
@@ -429,7 +429,7 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		$response.= '<div tabindex="0" class="mt_task"  data-task_id="' . $task['task_id'] . '" data-hx-post="/millcotasks/task/edit/' . $task['board_key'] . '/' . $task['task_id'] .'" hx-trigger="click,keyup[keyCode==13]" hx-swap="outerHTML">';
 			$response.= '<div class="mt_task_content">' . $task_content . '</div>';
 
-			if($task['user_key']){
+			if(isset($task['user_key']) && $task['user_key'] > 0){
 				$response.= '<div class="mt_meta">';
 				$response.='<div class="mt_meta_user">' . wire('users')->get($task['user_key'])->name . '</div>';
 				$response.='<div class="mt_meta_time">' . $task['task_time'] . '</div>';
