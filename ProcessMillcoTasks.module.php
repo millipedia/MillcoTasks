@@ -20,6 +20,11 @@ class ProcessMillcoTasks extends Process implements Module
 			'summary' => 'Card board process.',
 			'version' => 1,
 			'icon' => 'check-square-o',
+			'permission' => 'millco-tasks',
+			'permissions' => [
+				'millco-tasks' => __('Access the Tasks admin area (required to see Tasks in the menu).'),
+				'millco-tasks-manage' => __('Edit Millco Tasks settings.'),
+			],
 			'page' => [
 				'name' => 'mt-tasks',
 				'parent' => 'setup',
