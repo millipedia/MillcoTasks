@@ -151,3 +151,8 @@
 	background-color: var(--mt_dark);
 	transition: var(--transition);
 }
+
+.pw .mt_button_icon:focus{
+	background-color: var(--pw-main-color);
+	border-color: var(--pw-main-color);
+}
