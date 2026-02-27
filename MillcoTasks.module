@@ -389,7 +389,11 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 			$response.='<input type="hidden" name="deck_id" value="' . $deck_id .'">';
 			$response.='<input type="hidden" name="task_id" value="' . $task_id .'">';
 
-			$response.='<textarea name="task_content" required>' . $task_content . '</textarea>';
+			$response.='<textarea 
+				hx-post="/millcotasks/task/reset/'.  $task_id . '" 
+				hx-target="#mtef_' . $task_id .'"
+				hx-trigger="keydown[key==\'Escape\']"
+				name="task_content" required>' . $task_content . '</textarea>';
 
 			$response.='<div class="mtef_butts">';
 
