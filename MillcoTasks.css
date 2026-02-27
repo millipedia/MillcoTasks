@@ -29,6 +29,18 @@
 	cursor: pointer;
 }
 
+.mt_button_icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.mt_icon{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
 .mt_deck {
 	min-width: 320px;
 	max-width: 328px;
