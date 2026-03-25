@@ -274,9 +274,36 @@ function mtRemoveRepliesSlotAfterTaskDelete(evt){
 	if(slot) slot.remove();
 }
 
+/**
+ * The comments slot `#mt_replies_for_{id}` is a sibling of `.mt_task` / `#mtef_{id}`, not inside them.
+ * Opening edit swaps only the card for the form, so visible comments would stay. Cancel/save swaps
+ * only the form for new card markup (which includes a fresh empty slot), leaving the old slot in the DOM.
+ * Remove the slot before any swap that replaces the card or its edit form (existing tasks only).
+ */
+function mtRemoveRepliesSlotBeforeTaskSwap(evt){
+
+	var target = evt && evt.detail && evt.detail.target;
+	if(!target) return;
+
+	var taskId = 0;
+
+	if(target.classList && target.classList.contains("mt_task")){
+		taskId = parseInt(target.dataset.task_id || "0", 10) || 0;
+	} else if(target.id){
+		var m = target.id.match(/^mtef_(\d+)$/);
+		if(m) taskId = parseInt(m[1], 10) || 0;
+	}
+
+	if(!taskId) return;
+
+	var slot = document.getElementById("mt_replies_for_" + taskId);
+	if(slot) slot.remove();
+}
+
 // When comments change (add/edit/delete), update the toggle button count/label.
 // Use `document` not `document.body`: this file can run before <body> exists.
 // `afterSwap` is correct; the bug was reading `data-count` from `detail.target`
 // after an outerHTML swap (often the old detached node with stale attributes).
+document.addEventListener("htmx:beforeSwap", mtRemoveRepliesSlotBeforeTaskSwap);
 document.addEventListener("htmx:afterSwap", mtSyncCommentsButtonAfterSwap);
 document.addEventListener("htmx:afterRequest", mtRemoveRepliesSlotAfterTaskDelete);
