@@ -22,7 +22,7 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 			'singular' => true,
 			'permanent' => false,
 			'permission' => 'millco-tasks',
-			'icon' => 'check-on',
+			'icon' => 'check-square-o',
 			'requires' => [
 				'PHP>=8.0.0',
 				'ProcessWire>=3.0.16',
