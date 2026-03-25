@@ -5,6 +5,7 @@
 	--mt_grey_dark: hsl(0, 0%, 25%);
 	--mt_grey_mid: hsl(0, 0%, 50%);
 	--mt_grey_light: hsl(0, 0%, 94%);
+	--mt_grey_very_light: hsl(0, 0%, 98%);
 
 	--mt_dark: hsl(0, 0%, 15%);
 	--mt_pale: hsl(0, 0%, 99%);
@@ -52,7 +53,7 @@
 	padding: var(--mt_gap_small);
 	display: flex;
 	flex-direction: column;
-	gap: var(--mt_gap_small);
+	gap: 0;
 }
 
 .deck_header {
@@ -95,6 +96,92 @@
 	border-radius: 6px;
 	padding: var(--mt_gap_small);
 	border-radius: 4px;
+	margin-top: var(--mt_gap_small);
+}
+
+.mt_task:has(+ .mt_replies_slot:not(.is-hidden)){
+	border-radius: 4px 4px 0 0;
+}
+
+
+.mt_task_actions{
+	display: flex;
+	justify-content: end;
+	padding-top: 0.25rem;
+}
+
+.mt_button{
+	border: 1px solid var(--mt_grey_mid);
+	background: transparent;
+	border-radius: 4px;
+	font-size: 0.75rem !important;
+	padding: 0.25rem 0.5rem;
+	cursor: pointer;
+}
+
+.mt_replies_slot{
+	display: block;
+}
+
+.mt_replies_slot.is-hidden{
+	display: none;
+}
+
+.mt_replies{
+	margin-top: 0;
+	border: 1px solid var(--mt_grey_mid);
+	border-top: 0;
+	background-color: var(--mt_grey_very_light);
+	border-radius: 0 0 6px 6px;
+	padding: calc(var(--mt_gap_small) / 2);
+	display: flex;
+	flex-direction: column;
+	gap: var(--mt_gap_small);
+}
+
+.mt_replies_header{
+	font-weight: 700;
+	font-size: 0.75rem;
+	color: var(--mt_grey_dark);
+}
+
+.mt_replies_list{
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.mt_reply{
+	border: 1px solid var(--mt_grey_mid);
+	background-color: var(--mt_pale);
+	border-radius: 6px;
+	padding: 0.5rem;
+	cursor: pointer;
+}
+
+.mt_reply_meta{
+	font-size: 0.625rem;
+	color: var(--mt_grey_mid);
+	display: flex;
+	justify-content: space-between;
+	gap: 0.5rem;
+	padding-top: 0.25rem;
+}
+
+.mt_reply_form textarea{
+	width: 100%;
+	min-height: 6rem;
+	padding: 0.5rem;
+	font-size: 0.875rem;
+	line-height: 1.2;
+	font-family: sans-serif;
+}
+
+.mtrf_butts{
+	display: flex;
+	justify-content: end;
+	gap: var(--mt_gap_small);
+	padding-top: 0.25rem;
 }
 
 .mt_task_content {
@@ -123,7 +210,7 @@
 .mt_edit_form textarea {
 	width: 100%;
 	max-width: 320px;
-	min-height: 14rem;
+	min-height: 9rem;
 	height: fit-content;
 	padding: 0.5rem;
 	font-size: 1rem;
@@ -140,6 +227,7 @@
 .mtef_new {
 	border-top: 4px dotted var(--mt_grey_mid);
 	padding-top: var(--mt_gap_small);
+	margin-top: var(--mt_gap_small);
 }
 
 .mt_new_deck {
