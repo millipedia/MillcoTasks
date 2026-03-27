@@ -90,7 +90,7 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		wire()->addHook('/millcotasks/task/reset/{task_id}', function ($event) {
 			include('ajax_task_reset.php');
 		});
-		
+
 		// Delete a task.
 		wire()->addHook('/millcotasks/task/delete/{task_id}', function ($event) {
 			include('ajax_task_delete.php');
@@ -115,7 +115,7 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		wire()->addHook('/millcotasks/reply/delete/{reply_id}', function ($event) {
 			include('ajax_reply_delete.php');
 		});
-		
+
 		// Update sort order for an array of tasks.
 		wire()->addHook('/millcotasks/tasks/sort/', function ($event) {
 			include('ajax_tasks_sort.php');
@@ -133,7 +133,6 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		$this->config->scripts->add($this->config->urls->{$this} . "$this.js?v=$version");
 		$this->config->scripts->add($this->config->urls->{$this} . "lib/htmx.min.js?v=$version");
 		$this->config->scripts->add($this->config->urls->{$this} . "lib/Sortable.min.js?v=$version");
-
 	}
 
 	// public function ___execute()
@@ -157,9 +156,7 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 	// }
 
 	//ready() method: This is called after ProcessWire is fully bootstrapped, and is about to start rendering a page. At this point, the entire API is available and ready for use. This method can be used when you depend on the current page being accessed, like changing or adding certain behaviors or settings based on the current page or user.
-	public function ready()
-	{
-	}
+	public function ready() {}
 
 
 	/**
@@ -170,18 +167,18 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 	 * 
 	 */
 
-	public function board($board_id=1){
+	public function board($board_id = 1)
+	{
 
-		$board=$this->tasks($board_id);
-		$markup='';
-		$markup.='<script src="' . $this->config->urls->{$this} . 'MillcoTasks.js"></script>';
-		$markup.='<script src="' . $this->config->urls->{$this} . 'lib/htmx.min.js"></script>';
-		$markup.='<script src="' . $this->config->urls->{$this} . 'lib/Sortable.min.js"></script>';
+		$board = $this->tasks($board_id);
+		$markup = '';
+		$markup .= '<script src="' . $this->config->urls->{$this} . 'MillcoTasks.js"></script>';
+		$markup .= '<script src="' . $this->config->urls->{$this} . 'lib/htmx.min.js"></script>';
+		$markup .= '<script src="' . $this->config->urls->{$this} . 'lib/Sortable.min.js"></script>';
 
-		$markup.= wire('files')->render(wire('config')->paths->siteModules . 'MillcoTasks/templates/board.php', ['board'=>$board, 'mt'=>$this]);
+		$markup .= wire('files')->render(wire('config')->paths->siteModules . 'MillcoTasks/templates/board.php', ['board' => $board, 'mt' => $this]);
 
 		return $markup;
-
 	}
 
 
@@ -190,7 +187,8 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 	 * @param Int $board_id
 	 */
 
-	 public function deck_add($board_id){
+	public function deck_add($board_id)
+	{
 
 		$db = $this->wire('database');
 
@@ -202,7 +200,7 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		$query->execute($params);
 
 		return $db->lastInsertId();;
-	 }
+	}
 
 
 	/**
@@ -211,9 +209,10 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 	 * @param Int $deck_id 
 	 * @param Int $deck_order
 	 * @param Int $board_key (in case we ever manage to implement multiple boards.)
-	*/
+	 */
 
-	public function decks_update_sort_order($deck_id, $deck_order, $board_key=1){
+	public function decks_update_sort_order($deck_id, $deck_order, $board_key = 1)
+	{
 
 		$db = $this->wire('database');
 		$q = "UPDATE `millco_tasks_decks`
@@ -222,35 +221,35 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 			WHERE deck_id= :deck_id
 			LIMIT 1
 			";
-	
+
 		$params = array(":deck_id" => $deck_id, ":board_key" => $board_key, ":deck_order" => $deck_order);
 
 		$updated = $db->prepare($q);
-		$result=$updated->execute($params);
+		$result = $updated->execute($params);
 
 		return $result;
-
 	}
 
-	 /**
+	/**
 	 * Update the deck name
 	 * @param Int $deck_id
 	 * @param String $deck_title;
 	 */
 
-	 public function deck_title($deck_id, $deck_name){
+	public function deck_title($deck_id, $deck_name)
+	{
 
 		$db = $this->wire('database');
 
 		$u = "UPDATE `millco_tasks_decks` SET deck_name = :deck_name WHERE deck_id = :deck_id LIMIT 1;";
 
-		$params = array(":deck_id" => $deck_id,":deck_name" => $deck_name);
+		$params = array(":deck_id" => $deck_id, ":deck_name" => $deck_name);
 
 		$query = $db->prepare($u);
 		$query->execute($params);
 
 		return $db->lastInsertId();;
-	 }
+	}
 
 
 
@@ -259,12 +258,13 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 	 * Return tasks for a board
 	 */
 
-	public function tasks($board_id=1){
+	public function tasks($board_id = 1)
+	{
 
-		$board=[];
-		$board_id=(int)$board_id;
+		$board = [];
+		$board_id = (int)$board_id;
 
-		if(!$board_id){
+		if (!$board_id) {
 			return $board;
 		}
 
@@ -278,19 +278,19 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 				ORDER BY `deck_order`
 				LIMIT 50
 				";
-	
+
 
 		$params = array(":board_id" => $board_id);
 
 		$query = $db->prepare($q);
 		$query->execute($params);
 
-		while($row = $query->fetch()){
+		while ($row = $query->fetch()) {
 
-			$deck=[];
+			$deck = [];
 
-			$deck['deck_name']=$row['deck_name'];
-			$deck['deck_id']=$row['deck_id'];
+			$deck['deck_name'] = $row['deck_name'];
+			$deck['deck_id'] = $row['deck_id'];
 
 			$deck_q = "SELECT * 
 			FROM `millco_tasks_tasks`
@@ -299,15 +299,14 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 			ORDER BY `sort_order` ASC
 			LIMIT 50";
 
-			$params = array(":board_id" => $board_id, ":deck_id"=>$row['deck_id']);
+			$params = array(":board_id" => $board_id, ":deck_id" => $row['deck_id']);
 
 			$dquery = $db->prepare($deck_q);
 			$dquery->execute($params);
 
-			$deck['tasks']=$dquery->fetchAll();
+			$deck['tasks'] = $dquery->fetchAll();
 
-			$board[]=$deck;
-
+			$board[] = $deck;
 		};
 
 		return $board;
@@ -322,7 +321,8 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 	 * 
 	 */
 
-	public function task_add($board_key,$deck_key,$task_content){
+	public function task_add($board_key, $deck_key, $task_content)
+	{
 
 		$db = $this->wire('database');
 
@@ -332,21 +332,21 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		$sql = "INSERT INTO `millco_tasks_tasks` (`board_key`, `deck_key`, `task_content`, `user_key`)
 		VALUES (:board_key, :deck_key, :task_content, :user_key);";
 
-		$params = array(":board_key" => $board_key, ":deck_key"=>$deck_key,":task_content"=>$task_content, ":user_key"=>$user_key);
+		$params = array(":board_key" => $board_key, ":deck_key" => $deck_key, ":task_content" => $task_content, ":user_key" => $user_key);
 
 		$query = $db->prepare($sql);
 		$query->execute($params);
 
 		return $db->lastInsertId();;
-
 	}
 
 	/**
 	 * Task delete
 	 * @param Int $task_id 
-	*/
+	 */
 
-	public function task_delete($task_id){
+	public function task_delete($task_id)
+	{
 
 		$db = $this->wire('database');
 
@@ -357,22 +357,20 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		$params = array(":task_id" => $task_id);
 
 		$updated = $db->prepare($q);
-		$result=$updated->execute($params);
+		$result = $updated->execute($params);
 
 		// now delete the task.
 		$q = "DELETE FROM `millco_tasks_tasks`
 			WHERE task_id= :task_id
 			LIMIT 1
 			";
-	
+
 		$params = array(":task_id" => $task_id);
 
 		$updated = $db->prepare($q);
-		$result=$updated->execute($params);
+		$result = $updated->execute($params);
 
 		return $result;
-
-
 	}
 
 
@@ -381,132 +379,168 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 	 * 
 	 */
 
-	 public function task_form($task_id=-1,$board_id=1,$deck_id=1){
+	public function task_form($task_id = -1, $board_id = 1, $deck_id = 1)
+	{
 
-		$form_class='';
+		$form_class = '';
 		$task_id = (int) $task_id;
 
 		// if we have a task id then get this task from the db
-		if($task_id > 0){
+		if ($task_id > 0) {
 
-			$task=$this->task_from_id($task_id);
+			$task = $this->task_from_id($task_id);
 			// sanity check that the task board id matches what we've been passed.
-			$task_content=$task['task_content'];
-			$board_id=$task['board_key'];
-			$deck_id=$task['deck_key'];
+			$task_content = $task['task_content'];
+			$board_id = $task['board_key'];
+			$deck_id = $task['deck_key'];
 
-			$form_url='/millcotasks/task/update/'.  $task_id;
-
-		}else{
-			$task_content='';
-			$form_url='/millcotasks/task/add/';
-			$form_class.=' mtef_new';
+			$form_url = '/millcotasks/task/update/' .  $task_id;
+		} else {
+			$task_content = '';
+			$form_url = '/millcotasks/task/add/';
+			$form_class .= ' mtef_new';
 		}
 
-		$response='';
-		$response.='<form id="mtef_' . $task_id .'" class="mt_edit_form ' . $form_class . '" hx-post="' . $form_url .'" hx-swap="outerHTML">';
+		$response = '';
+		$response .= '<form id="mtef_' . $task_id . '" class="mt_edit_form ' . $form_class . '" hx-post="' . $form_url . '" hx-swap="outerHTML">';
 
-			$response.='<input type="hidden" name="board_id" value="' . $board_id .'">';
-			$response.='<input type="hidden" name="deck_id" value="' . $deck_id .'">';
-			$response.='<input type="hidden" name="task_id" value="' . $task_id .'">';
+		$response .= '<input type="hidden" name="board_id" value="' . $board_id . '">';
+		$response .= '<input type="hidden" name="deck_id" value="' . $deck_id . '">';
+		$response .= '<input type="hidden" name="task_id" value="' . $task_id . '">';
 
-			$response.='<textarea 
-				hx-post="/millcotasks/task/reset/'.  $task_id . '" 
-				hx-target="#mtef_' . $task_id .'"
+		$response .= '<textarea 
+				hx-post="/millcotasks/task/reset/' .  $task_id . '" 
+				hx-target="#mtef_' . $task_id . '"
 				hx-trigger="keydown[key==\'Escape\']"
 				name="task_content" required>' . $task_content . '</textarea>';
 
-			$response.='<div class="mtef_butts">';
+		$response .= '<div class="mtef_butts">';
 
-			// only show a cancel button if this is proper task and not for new tasks.
-			if($task_id > 0){
-				$response.='<button class="mt_button_icon uk-icon-button uk-icon-button-primary" 
-				hx-post="/millcotasks/task/reset/'.  $task_id . '" 
-				hx-target="#mtef_' . $task_id .'"
+		// only show a cancel button if this is proper task and not for new tasks.
+		if ($task_id > 0) {
+			$response .= '<button class="mt_button_icon uk-icon-button uk-icon-button-primary" 
+				hx-post="/millcotasks/task/reset/' .  $task_id . '" 
+				hx-target="#mtef_' . $task_id . '"
 				title="Cancel">
 				<span class="mt_icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="M17.414 16L24 9.414L22.586 8L16 14.586L9.414 8L8 9.414L14.586 16L8 22.586L9.414 24L16 17.414L22.586 24L24 22.586z"/></svg></span><span class="sr-only">Cancel</span>
 				</button>';
-				$response.='<button class="mt_button_icon uk-icon-button" hx-post="/millcotasks/task/delete/'.  $task_id . '" 
+			$response .= '<button class="mt_button_icon uk-icon-button" hx-post="/millcotasks/task/delete/' .  $task_id . '" 
 				hx-confirm="Delete this item?" 
-				hx-target="#mtef_' . $task_id .'" 
+				hx-target="#mtef_' . $task_id . '" 
 				title="Delete">
 				<span class="mt_icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="M12 12h2v12h-2zm6 0h2v12h-2z"/><path fill="currentColor" d="M4 6v2h2v20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8h2V6Zm4 22V8h16v20Zm4-26h8v2h-8z"/></svg></span>
 				<span class="sr-only">Delete</span>
 				</button>';
-				$response.='<button class="mt_button_icon uk-icon-button" type="submit" title="Save">
+			$response .= '<button class="mt_button_icon uk-icon-button" type="submit" title="Save">
 				<span class="mt_icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="m27.71 9.29l-5-5A1 1 0 0 0 22 4H6a2 2 0 0 0-2 2v20a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2V10a1 1 0 0 0-.29-.71M12 6h8v4h-8Zm8 20h-8v-8h8Zm2 0v-8a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8H6V6h4v4a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6.41l4 4V26Z"/></svg></span>
 				<span class="sr-only">Save</span>
 				</button>';
-			}else{
-				$response.='<button class="mt_button_icon uk-icon-button uk-icon-button-primary" type=submit><span class="mt_icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="M17 15V8h-2v7H8v2h7v7h2v-7h7v-2z"/></svg></span></button>';
-			}
+		} else {
+			$response .= '<button class="mt_button_icon uk-icon-button uk-icon-button-primary" type=submit><span class="mt_icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="M17 15V8h-2v7H8v2h7v7h2v-7h7v-2z"/></svg></span></button>';
+		}
 
-			$response.='</div>';
+		$response .= '</div>';
 
-		$response.='</form>';
-		
+		$response .= '</form>';
+
 		return $response;
-
 	}
 
 	/**
 	 * Task markup
+	 * Build the html for a task card.
 	 * @param $task Array;
 	 */
-	public function task_markup($task){
+	public function task_markup($task)
+	{
 
-		$response='';
+		$response = '';
 
 		$task_id = (int) ($task['task_id'] ?? 0);
 		$board_key = (int) ($task['board_key'] ?? 1);
-		$task_content=$task['task_content'];
+		$task_content = $task['task_content'];
 
 		// this sanitizer markdown seems to work for what we want.. .which is nice
 		// TODO: markdown should be an option I guess.
-		$task_content=wire('sanitizer')->entitiesMarkdown($task_content);
-		
+		$task_content = wire('sanitizer')->entitiesMarkdown($task_content);
+
 		// still need nl2br though.
-		$task_content=nl2br($task_content);
+		$task_content = nl2br($task_content);
 
-		$response.= '<div tabindex="0" class="mt_task"  data-task_id="' . $task_id . '" data-hx-post="/millcotasks/task/edit/' . $board_key . '/' . $task_id .'" hx-trigger="click,keyup[keyCode==13]" hx-swap="outerHTML">';
-			$response.= '<div class="mt_task_content">' . $task_content . '</div>';
+		$response .= '<div id="mt_task_' . $task_id . '" tabindex="0" class="mt_task"  >';
 
-			if(isset($task['user_key']) && $task['user_key'] > 0){
-				$response.= '<div class="mt_meta">';
-				$response.='<div class="mt_meta_user">' . wire('users')->get($task['user_key'])->name . '</div>';
-				$response.='<div class="mt_meta_time">' . $task['task_time'] . '</div>';
-				$response.='</div>';
-			}
+		$response .= '<div class="mt_task_content" data-task_id="' . $task_id . '" data-hx-post="/millcotasks/task/edit/' . $board_key . '/' . $task_id . '" hx-trigger="click,keyup[keyCode==13]" hx-target="#mt_task_' . $task_id . '" hx-swap="outerHTML">' . $task_content . '</div>';
 
-			$reply_count = $this->replies_count_for_task($task_id);
-			$btn_label = $reply_count > 0 ? ('Show comments (' . $reply_count . ')') : 'Add comment';
+		$response .= '<div class="mt_task_actions">';
 
-			$response .= '<div class="mt_task_actions">';
-				$response .= '<button type="button" class="mt_button mt_task_comments_button uk-button-default" '
-					. 'data-task_id="' . $task_id . '" '
-					. 'data-comments_count="' . $reply_count . '" '
-					. 'data-comments_url="/millcotasks/replies/' . $task_id . '" '
-					. 'onclick="event.stopPropagation(); return mtToggleReplies(' . $task_id . ', this);">'
-					. $btn_label
-					. '</button>';
+		if (isset($task['user_key']) && $task['user_key'] > 0) {
+			$response .= '<div class="mt_meta">';
+			$response .= '<div class="mt_meta_user">' . wire('users')->get($task['user_key'])->name . '</div>';
+			$response .= '<div class="mt_meta_time">' . $task['task_time'] . '</div>';
 			$response .= '</div>';
+		}
 
-		$response.= '</div>';
+		$reply_count = $this->replies_count_for_task($task_id);
 
-		$response .= '<div id="mt_replies_for_' . $task_id . '" class="mt_replies_slot is-hidden" aria-hidden="true"></div>';
+		$response .= $this->task_comments_button($task_id, $reply_count, $state = 'closed');
+
+
+		$response .= '</div>';
+
+		$response .= '<div id="mt_replies_for_' . $task_id . '" class="mt_replies_slot"></div>';
+
+		$response .= '</div>';
+
+
 
 
 
 		return $response;
 	}
 
+	/**
+	 * Markup for the show comments button.
+	 */
+
+	function task_comments_button($task_id, $reply_count, $state = 'open')
+	{
+
+		$button_markup = '';
+
+		$button_markup .= '<button id="mt_task_comments_button_' . $task_id . '" type="button" class="mt_button mt_task_comments_button" '
+			. 'data-task_id="' . $task_id . '" '
+			. 'data-comments_count="' . $reply_count . '" 
+			hx-get="/millcotasks/replies/' . $task_id . '?toggle=' . $state . '&count=' . $reply_count . '"
+			
+			';
+
+
+		if ($state === 'open') {
+
+			// when the button is open we want swap the button and empty the replies slot.
+			$button_markup .= ' hx-swap="outerHTML" hx-swap-oob="true">';
+			// close comments icon
+			$button_markup .= '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M28 8v13h2V8a4 4 0 0 0-4-4H8.243l2 2H26a1.997 1.997 0 0 1 2 2m2 20.586L3.414 2L2 3.414l1.504 1.504A3.92 3.92 0 0 0 2 8v12a4 4 0 0 0 4 4h6v-2H6a1.997 1.997 0 0 1-2-2V8a1.98 1.98 0 0 1 .92-1.666L20.585 22H17l-4 7l1.736 1l3.429-6h4.42l6 6Z"/></svg>';
+		} else {
+			// when the button is closed we load the replies into the replies slot.
+			$button_markup .= 'hx-target="#mt_replies_for_' . $task_id . '">';
+			// show comments icon
+			$button_markup .= '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="M17.74 30L16 29l4-7h6a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9v2H6a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4h20a4 4 0 0 1 4 4v12a4 4 0 0 1-4 4h-4.84Z"/><path fill="currentColor" d="M8 10h16v2H8zm0 6h10v2H8z"/></svg>';
+		}
+		$button_markup .= '<span class="comment_count">(' . $reply_count . ')</span>';
+		$button_markup .= '</button>';
+
+		return $button_markup;
+	}
+
 
 	/**
-	* Get a task from its id
-	* 
-	*/
+	 * Get a task from its id
+	 * 
+	 */
 
-	 public function task_from_id($task_id){
+	public function task_from_id($task_id)
+	{
 
 		$db = $this->wire('database');
 		$q = "SELECT *
@@ -514,29 +548,29 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 				WHERE task_id= :task_id
 				LIMIT 1
 				";
-	
+
 
 		$params = array(":task_id" => $task_id);
 
 		$query = $db->prepare($q);
 		$query->execute($params);
 
-		$task_row=$query->fetch();
-		
-		return $task_row;
+		$task_row = $query->fetch();
 
+		return $task_row;
 	}
 
-	
-	
+
+
 
 	/**
 	 * Task update
 	 * @param Int $task_id 
 	 * @param String $task_content
-	*/
+	 */
 
-	public function task_update($task_id, $task_content){
+	public function task_update($task_id, $task_content)
+	{
 
 		$db = $this->wire('database');
 		$q = "UPDATE `millco_tasks_tasks`
@@ -544,16 +578,14 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 			WHERE task_id= :task_id
 			LIMIT 1
 			";
-	
+
 
 		$params = array(":task_id" => $task_id, ":task_content" => $task_content);
 
 		$updated = $db->prepare($q);
-		$result=$updated->execute($params);
+		$result = $updated->execute($params);
 
 		return $result;
-
-
 	}
 
 	/**
@@ -562,9 +594,10 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 	 * @param Int $task_id 
 	 * @param Int $sort_order
 	 * @param Int $deck_key
-	*/
+	 */
 
-	public function task_update_sort_order($task_id, $sort_order, $deck_key){
+	public function task_update_sort_order($task_id, $sort_order, $deck_key)
+	{
 
 
 		$db = $this->wire('database');
@@ -574,24 +607,24 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 			WHERE task_id= :task_id
 			LIMIT 1
 			";
-	
+
 
 		$params = array(":task_id" => $task_id, ":deck_key" => $deck_key, ":sort_order" => $sort_order);
 
 		$updated = $db->prepare($q);
-		$result=$updated->execute($params);
+		$result = $updated->execute($params);
 
 		return $result;
-
 	}
 
 	/**
 	 * Replies (comments)
 	 */
 
-	public function replies_for_task(int $task_id): array {
+	public function replies_for_task(int $task_id): array
+	{
 
-		if($task_id < 1) return [];
+		if ($task_id < 1) return [];
 
 		$db = $this->wire('database');
 		$q = "SELECT *
@@ -607,9 +640,10 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		return is_array($rows) ? $rows : [];
 	}
 
-	public function replies_count_for_task(int $task_id): int {
+	public function replies_count_for_task(int $task_id): int
+	{
 
-		if($task_id < 1) return 0;
+		if ($task_id < 1) return 0;
 
 		$db = $this->wire('database');
 		$q = "SELECT COUNT(*) AS cnt
@@ -623,9 +657,10 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		return isset($row['cnt']) ? (int)$row['cnt'] : 0;
 	}
 
-	public function reply_from_id(int $reply_id): ?array {
+	public function reply_from_id(int $reply_id): ?array
+	{
 
-		if($reply_id < 1) return null;
+		if ($reply_id < 1) return null;
 
 		$db = $this->wire('database');
 		$q = "SELECT *
@@ -640,10 +675,11 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		return is_array($row) ? $row : null;
 	}
 
-	public function reply_add(int $task_id, string $reply_content): int {
+	public function reply_add(int $task_id, string $reply_content): int
+	{
 
 		$task_id = (int) $task_id;
-		if($task_id < 1) return 0;
+		if ($task_id < 1) return 0;
 
 		$user = wire('user');
 		$user_key = (int) $user->id;
@@ -662,20 +698,22 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		return (int) $db->lastInsertId();
 	}
 
-	protected function can_edit_reply(array $reply): bool {
+	protected function can_edit_reply(array $reply): bool
+	{
 
 		$user = wire('user');
-		if(!$user || !$user->id) return false;
-		if($user->hasPermission('millco-tasks-manage')) return true;
+		if (!$user || !$user->id) return false;
+		if ($user->hasPermission('millco-tasks-manage')) return true;
 
 		return isset($reply['user_key']) && (int)$reply['user_key'] === (int)$user->id;
 	}
 
-	public function reply_update(int $reply_id, string $reply_content): bool {
+	public function reply_update(int $reply_id, string $reply_content): bool
+	{
 
 		$reply = $this->reply_from_id($reply_id);
-		if(!$reply) return false;
-		if(!$this->can_edit_reply($reply)) return false;
+		if (!$reply) return false;
+		if (!$this->can_edit_reply($reply)) return false;
 
 		$db = $this->wire('database');
 		$q = "UPDATE `millco_tasks_replies`
@@ -690,11 +728,12 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		]);
 	}
 
-	public function reply_delete(int $reply_id): bool {
+	public function reply_delete(int $reply_id): bool
+	{
 
 		$reply = $this->reply_from_id($reply_id);
-		if(!$reply) return false;
-		if(!$this->can_edit_reply($reply)) return false;
+		if (!$reply) return false;
+		if (!$this->can_edit_reply($reply)) return false;
 
 		$db = $this->wire('database');
 		$q = "DELETE FROM `millco_tasks_replies`
@@ -705,7 +744,8 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		return (bool) $deleted->execute([":reply_id" => $reply_id]);
 	}
 
-	public function reply_markup(array $reply): string {
+	public function reply_markup(array $reply): string
+	{
 
 		$reply_id = (int) ($reply['reply_id'] ?? 0);
 		$task_id = (int) ($reply['task_id'] ?? 0);
@@ -715,7 +755,7 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		$content = nl2br($content);
 
 		$user_label = '';
-		if(isset($reply['user_key']) && (int)$reply['user_key'] > 0){
+		if (isset($reply['user_key']) && (int)$reply['user_key'] > 0) {
 			$user_label = wire('users')->get((int)$reply['user_key'])->name;
 		}
 		$date_label = (string) ($reply['reply_date'] ?? '');
@@ -727,28 +767,29 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 
 		$response = '';
 		$response .= '<div class="mt_reply" data-reply_id="' . $reply_id . '" data-task_id="' . $task_id . '"' . $edit_attrs . '>';
-			$response .= '<div class="mt_reply_content">' . $content . '</div>';
-			if($user_label || $date_label){
-				$response .= '<div class="mt_reply_meta">';
-					if($user_label) $response .= '<span class="mt_reply_user">' . $user_label . '</span>';
-					if($date_label) $response .= '<span class="mt_reply_time">' . $date_label . '</span>';
-				$response .= '</div>';
-			}
+		$response .= '<div class="mt_reply_content">' . $content . '</div>';
+		if ($user_label || $date_label) {
+			$response .= '<div class="mt_reply_meta">';
+			if ($user_label) $response .= '<span class="mt_reply_user">' . $user_label . '</span>';
+			if ($date_label) $response .= '<span class="mt_reply_time">' . $date_label . '</span>';
+			$response .= '</div>';
+		}
 		$response .= '</div>';
 
 		return $response;
 	}
 
-	public function reply_form(int $reply_id = -1, int $task_id = 0): string {
+	public function reply_form(int $reply_id = -1, int $task_id = 0): string
+	{
 
 		$form_class = '';
 		$form_url = '';
 		$reply_content = '';
 
-		if($reply_id > 0){
+		if ($reply_id > 0) {
 			$reply = $this->reply_from_id($reply_id);
-			if(!$reply) return '<div class="mt_reply_error">Reply not found.</div>';
-			if(!$this->can_edit_reply($reply)) return '<div class="mt_reply_error">Not allowed.</div>';
+			if (!$reply) return '<div class="mt_reply_error">Reply not found.</div>';
+			if (!$this->can_edit_reply($reply)) return '<div class="mt_reply_error">Not allowed.</div>';
 
 			$task_id = (int) $reply['task_id'];
 			$reply_content = (string) $reply['reply_content'];
@@ -760,52 +801,53 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 
 		$response = '';
 		$response .= '<form id="mtrf_' . (int)$reply_id . '" class="mt_reply_form ' . $form_class . '" hx-post="' . $form_url . '" hx-target="closest .mt_replies" hx-swap="outerHTML">';
-			$response .= '<input type="hidden" name="task_id" value="' . (int)$task_id . '">';
-			$response .= '<input type="hidden" name="reply_id" value="' . (int)$reply_id . '">';
+		$response .= '<input type="hidden" name="task_id" value="' . (int)$task_id . '">';
+		$response .= '<input type="hidden" name="reply_id" value="' . (int)$reply_id . '">';
 
-			$response .= '<textarea '
-				. 'name="reply_content" required '
+		$response .= '<textarea '
+			. 'name="reply_content" required '
+			. 'hx-post="/millcotasks/reply/reset/' . (int)$reply_id . '" '
+			. 'hx-target="#mtrf_' . (int)$reply_id . '" '
+			. 'hx-trigger="keydown[key==\'Escape\']"'
+			. '>' . $reply_content . '</textarea>';
+
+		$response .= '<div class="mtrf_butts">';
+		if ($reply_id > 0) {
+			$response .= '<button class="mt_button_icon uk-icon-button uk-icon-button-primary" '
 				. 'hx-post="/millcotasks/reply/reset/' . (int)$reply_id . '" '
 				. 'hx-target="#mtrf_' . (int)$reply_id . '" '
-				. 'hx-trigger="keydown[key==\'Escape\']"'
-				. '>' . $reply_content . '</textarea>';
+				. 'title="Cancel" type="button">'
+				. '<span class="mt_icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="M17.414 16L24 9.414L22.586 8L16 14.586L9.414 8L8 9.414L14.586 16L8 22.586L9.414 24L16 17.414L22.586 24L24 22.586z"/></svg></span><span class="sr-only">Cancel</span>'
+				. '</button>';
 
-			$response .= '<div class="mtrf_butts">';
-				if($reply_id > 0){
-					$response .= '<button class="mt_button_icon uk-icon-button uk-icon-button-primary" '
-						. 'hx-post="/millcotasks/reply/reset/' . (int)$reply_id . '" '
-						. 'hx-target="#mtrf_' . (int)$reply_id . '" '
-						. 'title="Cancel" type="button">'
-						. '<span class="mt_icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="M17.414 16L24 9.414L22.586 8L16 14.586L9.414 8L8 9.414L14.586 16L8 22.586L9.414 24L16 17.414L22.586 24L24 22.586z"/></svg></span><span class="sr-only">Cancel</span>'
-						. '</button>';
+			$response .= '<button class="mt_button_icon uk-icon-button" '
+				. 'hx-post="/millcotasks/reply/delete/' . (int)$reply_id . '" '
+				. 'hx-confirm="Delete this comment?" '
+				. 'hx-target="closest .mt_replies" '
+				. 'hx-swap="outerHTML" '
+				. 'title="Delete" type="button">'
+				. '<span class="mt_icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="M12 12h2v12h-2zm6 0h2v12h-2z"/><path fill="currentColor" d="M4 6v2h2v20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8h2V6Zm4 22V8h16v20Zm4-26h8v2h-8z"/></svg></span><span class="sr-only">Delete</span>'
+				. '</button>';
 
-					$response .= '<button class="mt_button_icon uk-icon-button" '
-						. 'hx-post="/millcotasks/reply/delete/' . (int)$reply_id . '" '
-						. 'hx-confirm="Delete this comment?" '
-						. 'hx-target="closest .mt_replies" '
-						. 'hx-swap="outerHTML" '
-						. 'title="Delete" type="button">'
-						. '<span class="mt_icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="M12 12h2v12h-2zm6 0h2v12h-2z"/><path fill="currentColor" d="M4 6v2h2v20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8h2V6Zm4 22V8h16v20Zm4-26h8v2h-8z"/></svg></span><span class="sr-only">Delete</span>'
-						. '</button>';
-
-					$response .= '<button class="mt_button_icon uk-icon-button" type="submit" title="Save">'
-						. '<span class="mt_icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="m27.71 9.29l-5-5A1 1 0 0 0 22 4H6a2 2 0 0 0-2 2v20a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2V10a1 1 0 0 0-.29-.71M12 6h8v4h-8Zm8 20h-8v-8h8Zm2 0v-8a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8H6V6h4v4a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6.41l4 4V26Z"/></svg></span><span class="sr-only">Save</span>'
-						. '</button>';
-				} else {
-					$response .= '<button class="mt_button_icon uk-icon-button uk-icon-button-primary" type="submit" title="Add comment">'
-						. '<span class="mt_icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="M17 15V8h-2v7H8v2h7v7h2v-7h7v-2z"/></svg></span><span class="sr-only">Add</span>'
-						. '</button>';
-				}
-			$response .= '</div>';
+			$response .= '<button class="mt_button_icon uk-icon-button" type="submit" title="Save">'
+				. '<span class="mt_icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="m27.71 9.29l-5-5A1 1 0 0 0 22 4H6a2 2 0 0 0-2 2v20a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2V10a1 1 0 0 0-.29-.71M12 6h8v4h-8Zm8 20h-8v-8h8Zm2 0v-8a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8H6V6h4v4a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6.41l4 4V26Z"/></svg></span><span class="sr-only">Save</span>'
+				. '</button>';
+		} else {
+			$response .= '<button class="mt_button_icon uk-icon-button uk-icon-button-primary" type="submit" title="Add comment">'
+				. '<span class="mt_icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="M17 15V8h-2v7H8v2h7v7h2v-7h7v-2z"/></svg></span><span class="sr-only">Add</span>'
+				. '</button>';
+		}
+		$response .= '</div>';
 		$response .= '</form>';
 
 		return $response;
 	}
 
-	public function replies_markup(int $task_id): string {
+	public function replies_markup(int $task_id): string
+	{
 
 		$task_id = (int) $task_id;
-		if($task_id < 1) return '';
+		if ($task_id < 1) return '';
 
 		$user = wire('user');
 		$can_add = $user && $user->isLoggedin() && $user->hasPermission('millco-tasks');
@@ -814,29 +856,33 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		$count = count($replies);
 
 		$response = '';
-		$response .= '<div class="mt_replies" data-task_id="' . $task_id . '" data-count="' . $count . '">';
-			$response .= '<div class="mt_replies_header">Comments (' . $count . ')</div>';
-			if($count){
-				$response .= '<div class="mt_replies_list">';
-				foreach($replies as $reply){
-					$response .= $this->reply_markup($reply);
-				}
-				$response .= '</div>';
-			} else {
-				$response .= '<div class="mt_replies_empty">No comments yet.</div>';
-			}
 
-			if($can_add){
-				$response .= '<div class="mt_reply_add">';
-					$response .= $this->reply_form(-1, $task_id);
-				$response .= '</div>';
+		$response .= '<div class="mt_replies" data-task_id="' . $task_id . '" data-count="' . $count . '">';
+		$response .= '<div class="mt_replies_header">Comments (' . $count . ')</div>';
+		if ($count) {
+			$response .= '<div class="mt_replies_list">';
+			foreach ($replies as $reply) {
+				$response .= $this->reply_markup($reply);
 			}
+			$response .= '</div>';
+		}
+
+		if ($can_add) {
+			$response .= '<div class="mt_reply_add">';
+			$response .= $this->reply_form(-1, $task_id);
+			$response .= '</div>';
+		}
 		$response .= '</div>';
+
+		// add an out of bounds swap for the comments button.
+		$response .= $this->task_comments_button($task_id, $count, $state = 'open');
+
 
 		return $response;
 	}
 
-	public function ___install() {
+	public function ___install()
+	{
 
 		$database = $this->wire('database');
 
@@ -846,11 +892,11 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		);
 		
 		INSERT INTO `millco_tasks_boards` (`board_name`) VALUES ('Tasks');";
-	
+
 		try {
 			$database->exec($sql);
-		} catch(Exception $e) {
-			$this->message("Could not create table: ".$e->getMessage());
+		} catch (Exception $e) {
+			$this->message("Could not create table: " . $e->getMessage());
 		}
 
 		$sql = "CREATE TABLE IF NOT EXISTS `millco_tasks_decks` (
@@ -861,13 +907,13 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		);
 		
 		INSERT INTO `millco_tasks_decks` (`deck_name`,`board_key`) VALUES ('Deck 1', 1);";
-	
+
 		try {
 			$database->exec($sql);
-		} catch(Exception $e) {
-			$this->message("Could not create table: ".$e->getMessage());
+		} catch (Exception $e) {
+			$this->message("Could not create table: " . $e->getMessage());
 		}
-	
+
 		$sql = "CREATE TABLE IF NOT EXISTS `millco_tasks_tasks` (
 			`task_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 			`board_key` INT(10) NOT NULL,
@@ -877,11 +923,11 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 			`user_key` INT(10) NULL,
 			`task_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 		)";
-	
+
 		try {
 			$database->exec($sql);
-		} catch(Exception $e) {
-			$this->message("Could not create table: ".$e->getMessage());
+		} catch (Exception $e) {
+			$this->message("Could not create table: " . $e->getMessage());
 		}
 
 		// Ooooh - can we trust that the first board we created is always 1?
@@ -889,11 +935,11 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		$sql = "INSERT INTO `millco_tasks_tasks` (`board_key`, `deck_key`, `task_content`, `user_key`)
 		VALUES ('1', '1', 'Welcome to the task board!', $user_key);
 		";
-	
+
 		try {
 			$database->exec($sql);
-		} catch(Exception $e) {
-			$this->message("Could not create table: ".$e->getMessage());
+		} catch (Exception $e) {
+			$this->message("Could not create table: " . $e->getMessage());
 		}
 
 
@@ -904,31 +950,30 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 			`reply_date` DATETIME NOT NULL,
 			`user_key` INT(10) NOT NULL
 		)";
-	
+
 		try {
 			$database->exec($sql);
-		} catch(Exception $e) {
-			$this->message("Could not create replies table: ".$e->getMessage());
+		} catch (Exception $e) {
+			$this->message("Could not create replies table: " . $e->getMessage());
 		}
 
-	return true;
-
-
+		return true;
 	}
 
 
-	public function ___uninstall() {
+	public function ___uninstall()
+	{
 
 		$database = $this->wire('database');
-	
+
 		$sql = "DROP TABLE `millco_tasks_boards`;
 				DROP TABLE `millco_tasks_decks`;
 				DROP TABLE `millco_tasks_tasks`";
-	
+
 		try {
 			$database->exec($sql);
-		} catch(Exception $e) {
-			$this->message("Could not drop table: ".$e->getMessage());
+		} catch (Exception $e) {
+			$this->message("Could not drop table: " . $e->getMessage());
 		}
 
 		return true;
@@ -939,38 +984,36 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 	 * Upgrade
 	 */
 
-	public function ___upgrade($fromVersion, $toVersion) {
+	public function ___upgrade($fromVersion, $toVersion)
+	{
 
-		if(version_compare($fromVersion, "4", "<")) {
+		if (version_compare($fromVersion, "4", "<")) {
 
 			$database = $this->wire('database');
 
 			$sql = "ALTER TABLE `millco_tasks_decks` ADD `deck_order` int NOT NULL;";
-		
+
 			try {
 				$database->exec($sql);
 
 				$this->log("Added deck_order to decks table");
-
-			} catch(Exception $e) {
-				$this->message("Could not update table: ".$e->getMessage());
+			} catch (Exception $e) {
+				$this->message("Could not update table: " . $e->getMessage());
 			}
-
 		}
 
-		if(version_compare($fromVersion, "5", "<")) {
+		if (version_compare($fromVersion, "5", "<")) {
 
 			$database = $this->wire('database');
 
 			$sql = "ALTER TABLE `millco_tasks_tasks` ADD `task_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, ADD `user_key` INT(10) NULL;";
-		
+
 			try {
 				$database->exec($sql);
 
 				$this->log("Added task_time and user_key to tasks table");
-
-			} catch(Exception $e) {
-				$this->message("Could not update table: ".$e->getMessage());
+			} catch (Exception $e) {
+				$this->message("Could not update table: " . $e->getMessage());
 			}
 
 			$sql = "CREATE TABLE IF NOT EXISTS `millco_tasks_replies` (
@@ -980,15 +1023,12 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 				`reply_date` DATETIME NOT NULL,
 				`user_key` INT(10) NOT NULL
 			)";
-		
+
 			try {
 				$database->exec($sql);
-			} catch(Exception $e) {
-				$this->message("Could not create replies table: ".$e->getMessage());
+			} catch (Exception $e) {
+				$this->message("Could not create replies table: " . $e->getMessage());
 			}
-
 		}
 	}
-	
-
 }

@@ -13,10 +13,10 @@ if(wire('input')->post('task_id')){
 
 	$task_id=(int)wire('input')->post('task_id');
 
-	// just load it again in the right format
+	/** @var MillcoTasks $this */
 	if($this->task_delete($task_id)){
-		// Main swap replaces the edit form with nothing; OOB removes the comments slot sibling.
-		$response = '<div id="mt_replies_for_' . (int) $task_id . '" hx-swap-oob="delete"></div>';
+		// Return empty string to remove the task card from the DOM.
+		$response = '';
 	}else{
 		$response='Could not delete task.';
 	}

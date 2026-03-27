@@ -6,6 +6,8 @@ namespace ProcessWire;
  * Add a new reply (comment) to a task.
  */
 
+ /** @var MillcoTasks $this */
+
 $task_id = (int) $event->arguments('task_id');
 
 if(!$task_id){
