@@ -51,6 +51,7 @@
 	overflow: auto;
 	border: 1px solid var(--mt_grey_mid);
 	background-color: var(--mt_grey_light);
+	color: var(--mt_dark);
 	border-radius: 6px;
 	padding: var(--mt_gap_small);
 	display: flex;
@@ -66,6 +67,7 @@
 	border: 0;
 	border-bottom: 1px solid var(--mt_grey_mid);
 	background-color: transparent;
+	color: var(--mt_dark);
 	font-weight: 700;
 	flex: 1;
 }
@@ -231,12 +233,14 @@
 .mt_edit_form textarea {
 	width: 100%;
 	max-width: 320px;
-	min-height: 9rem;
+	min-height: 7rem;
 	height: fit-content;
 	padding: 0.5rem;
 	font-size: 1rem;
 	line-height: 1.2;
 	font-family: sans-serif;
+	background-color: var(--mt_grey_light);
+	color: var(--mt_dark);
 }
 
 .mtef_butts {
