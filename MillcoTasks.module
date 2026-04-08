@@ -467,7 +467,7 @@ class MillcoTasks extends WireData implements Module, ConfigurableModule
 		// still need nl2br though.
 		$task_content = nl2br($task_content);
 
-		$response .= '<div id="mt_task_' . $task_id . '" tabindex="0" class="mt_task"  >';
+		$response .= '<div id="mt_task_' . $task_id . '" tabindex="0" class="mt_task" data-task_id="' . $task_id . '" >';
 
 		$response .= '<div class="mt_task_content" data-task_id="' . $task_id . '" data-hx-post="/millcotasks/task/edit/' . $board_key . '/' . $task_id . '" hx-trigger="click,keyup[keyCode==13]" hx-target="#mt_task_' . $task_id . '" hx-swap="outerHTML">' . $task_content . '</div>';
 

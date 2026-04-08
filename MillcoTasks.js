@@ -59,7 +59,6 @@ function sort_order_update(deck){
 
 		}
 
-
 	fetch(`/millcotasks/tasks/sort/`, {
 		method: "POST",
 		body: JSON.stringify({
